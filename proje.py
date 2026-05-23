@@ -37,7 +37,7 @@ with st.sidebar:
 
 # --- ANA EKRAN BAŞLIK ---
 st.title("⚡ Enerji İletim Hatları Hesaplama Aracı")
-st.subheader("Grup 7 Özel: 154kV Drake ve 400kV Rail Hat Analizleri")
+st.subheader("Grup 7 Özel: Hat Analizleri")
 st.divider()
 
 # --- UYGULAMAYI SEKMELERE BÖLME ---
