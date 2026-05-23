@@ -41,7 +41,7 @@ st.subheader("Grup 7 Özel: 154kV Drake ve 400kV Rail Hat Analizleri")
 st.divider()
 
 # --- UYGULAMAYI SEKMELERE BÖLME ---
-tab1, tab2 = st.tabs(["🧮 Kısım 1: Tekil Hesaplayıcı", "📊 Kısım 2: Grup 7 Toplu Analiz"])
+tab1, tab2 = st.tabs(["🧮 Kısım 1: Hat Parametre Hesapları", "📊 Kısım 2: Grup 7 Hat ve Sistem Hesaplamaları"])
 
 # ==========================================
 # SEKME 1: TEKİL HESAPLAYICI (KISIM 1)
