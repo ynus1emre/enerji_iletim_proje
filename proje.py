@@ -31,8 +31,9 @@ with st.sidebar:
     st.markdown("4. Enes Faruk Kelleveziroğlu - 240206001")
     st.markdown("5. Faruk Sevim - 190206047")
     st.markdown("6. Kağan Özmen - 190206031")
+    st.markdown("7. Bahadır Yılmaz - 200206093")
     st.divider()
-    st.caption("Enerji İletimi Dersi Projesi Kısım 1 ve 2")
+    st.caption("Enerji İletimi Dersi Projesi Kısım 1 paces ve 2")
 
 # --- ANA EKRAN BAŞLIK ---
 st.title("⚡ Enerji İletim Hatları Hesaplama Aracı")
@@ -43,7 +44,7 @@ st.divider()
 tab1, tab2 = st.tabs(["🧮 Kısım 1: Tekil Hesaplayıcı", "📊 Kısım 2: Grup 7 Toplu Analiz"])
 
 # ==========================================
-# SEKME 1: SENİN YAZDIĞIN TEKİL HESAPLAYICI
+# SEKME 1: TEKİL HESAPLAYICI (KISIM 1)
 # ==========================================
 with tab1:
     freq = 50.0
@@ -136,8 +137,8 @@ with tab1:
 # SEKME 2: GRUP 7 PROJE KISIM 2 ÇÖZÜMLERİ
 # ==========================================
 with tab2:
-    st.markdown("### 🎯 Kısım 2: Grup 7 Özel Analizleri (6 Koşul)")
-    st.info("Bu modül, raporunuzda istenen A, B, C ve D şıklarını 6 grup koşulu için otomatik hesaplar, tabloları oluşturur ve P-V / Gerilim grafiklerini çizer.")
+    st.markdown("### 🎯 Kısım 2: Grup 7 Özel Analizleri (7 Koşul)")
+    st.info("Bu modül, raporunuzda istenen A, B, C ve D şıklarını 7 grup koşulu için sıralı olarak hesaplar, tabloları oluşturur ve P-V / Gerilim grafiklerini çizer.")
     
     if st.button("🚀 Tüm Analizleri Başlat ve Çizdir", use_container_width=True, type="primary"):
         with st.spinner("Hesaplamalar yapılıyor ve grafikler çiziliyor... Lütfen bekleyin."):
@@ -147,14 +148,15 @@ with tab2:
             R_drake, L_drake, C_drake = 0.0405, 0.582e-3, 19.85e-9  # Çift Devre TA1
             R_rail, L_rail, C_rail = 0.03417, 0.9982e-3, 11.40e-9   # Tek Devre 2'li Demet 3B1
             
-            # Koşullar Matrisi: [No, Gerilim, Uzunluk, pf, pf_tipi(1=Kap, -1=End), IletkenTipi]
+            # Koşullar Matrisi 7 Kişiye Çıkarıldı ve Sıralandı
             kosullar = [
                 (1, 154, 100, 0.95, -1, "Drake (Çift)"),
                 (2, 154, 150, 0.95, 1, "Drake (Çift)"),
                 (3, 154, 100, 0.95, 1, "Drake (Çift)"),
-                (5, 400, 200, 0.85, 1, "Rail (Tek 2'li)"),
-                (7, 400, 200, 0.85, -1, "Rail (Tek 2'li)"),
-                (8, 400, 250, 0.85, -1, "Rail (Tek 2'li)")
+                (4, 400, 200, 0.85, 1, "Rail (Tek 2'li)"),
+                (5, 400, 250, 0.85, 1, "Rail (Tek 2'li)"),  # Bahadır Yılmaz için eklenen yeni koşul
+                (6, 400, 200, 0.85, -1, "Rail (Tek 2'li)"),
+                (7, 400, 250, 0.85, -1, "Rail (Tek 2'li)")
             ]
             
             sonuclar_A = []
@@ -248,7 +250,7 @@ with tab2:
                 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
                 
                 # B Şıkkı: Hat Profili
-                x_vals = np.linspace(0, l, 11) # Hat sonundan başına 10 parça (11 nokta)
+                x_vals = np.linspace(0, l, 11)
                 Vx_vals = []
                 for x in x_vals:
                     Ax = np.cosh(gamma * x)
@@ -260,7 +262,7 @@ with tab2:
                 ax1.set_title("B Şıkkı: Hat Boyunca Gerilim Profili")
                 ax1.set_xlabel("Hat Başından Uzaklık (km)")
                 ax1.set_ylabel("Gerilim (kV)")
-                ax1.invert_xaxis() # Hat başı (0) solda olsun
+                ax1.invert_xaxis()
                 ax1.grid(True)
                 
                 # C Şıkkı: P-V Eğrisi
@@ -268,7 +270,8 @@ with tab2:
                 P1_curve, V1_curve = [], []
                 for k_l in k_loads:
                     S2_step = k_l * S2_VA
-                    I2_step = np.conj((complex(S2_step*pf, pf_type*S2_step*np.np.sin(np.arccos(pf)))) / (3*V2))
+                    # np.np.sin hatası np.sin olarak tamamen düzeltildi:
+                    I2_step = np.conj((complex(S2_step*pf, pf_type*S2_step*np.sin(np.arccos(pf)))) / (3*V2))
                     V1_step = A*V2 + B*I2_step
                     I1_step = C_param*V2 + D*I2_step
                     V1_curve.append(abs(V1_step) * np.sqrt(3) / 1000)
@@ -293,4 +296,3 @@ with tab2:
             st.markdown("### 📋 D Şıkkı: Seri Kompanzasyon (%30 ve %50) Tablosu")
             df_D = pd.DataFrame(sonuclar_D)
             st.dataframe(df_D, use_container_width=True)
-            
