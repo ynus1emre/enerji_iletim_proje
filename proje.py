@@ -33,7 +33,7 @@ with st.sidebar:
     st.markdown("6. Kağan Özmen - 190206031")
     st.markdown("7. Bahadır Yılmaz - 200206093")
     st.divider()
-    st.caption("Enerji İletimi Dersi Projesi Kısım 1 paces ve 2")
+    st.caption("Enerji İletimi Dersi Projesi Kısım 1 ve 2")
 
 # --- ANA EKRAN BAŞLIK ---
 st.title("⚡ Enerji İletim Hatları Hesaplama Aracı")
@@ -138,7 +138,9 @@ with tab1:
 # ==========================================
 with tab2:
     st.markdown("### 🎯 Kısım 2: Grup 7 Özel Analizleri (7 Koşul)")
-    st.info("Bu modül, raporunuzda istenen A, B, C ve D şıklarını 7 grup koşulu için sıralı olarak hesaplar, tabloları oluşturur ve P-V / Gerilim grafiklerini çizer.")
+    
+    # --- DÜZELTİLEN YAZI 1 ---
+    st.info("Bu modül, A, B, C ve D şıklarındaki analizleri 7 grup koşulu için sıralı olarak hesaplar, tabloları oluşturur ve P-V / Gerilim grafiklerini çizer.")
     
     if st.button("🚀 Tüm Analizleri Başlat ve Çizdir", use_container_width=True, type="primary"):
         with st.spinner("Hesaplamalar yapılıyor ve grafikler çiziliyor... Lütfen bekleyin."):
@@ -154,7 +156,7 @@ with tab2:
                 (2, 154, 150, 0.95, 1, "Drake (Çift)"),
                 (3, 154, 100, 0.95, 1, "Drake (Çift)"),
                 (4, 400, 200, 0.85, 1, "Rail (Tek 2'li)"),
-                (5, 400, 250, 0.85, 1, "Rail (Tek 2'li)"),  # Bahadır Yılmaz için eklenen yeni koşul
+                (5, 400, 250, 0.85, 1, "Rail (Tek 2'li)"),
                 (6, 400, 200, 0.85, -1, "Rail (Tek 2'li)"),
                 (7, 400, 250, 0.85, -1, "Rail (Tek 2'li)")
             ]
@@ -270,7 +272,6 @@ with tab2:
                 P1_curve, V1_curve = [], []
                 for k_l in k_loads:
                     S2_step = k_l * S2_VA
-                    # np.np.sin hatası np.sin olarak tamamen düzeltildi:
                     I2_step = np.conj((complex(S2_step*pf, pf_type*S2_step*np.sin(np.arccos(pf)))) / (3*V2))
                     V1_step = A*V2 + B*I2_step
                     I1_step = C_param*V2 + D*I2_step
@@ -287,7 +288,9 @@ with tab2:
                 st.divider()
 
             # --- TABLOLARI EKRANA BASMA ---
-            st.success("Tüm hesaplamalar başarıyla tamamlandı! Tabloları aşağıdan inceleyip raporunuza kopyalayabilirsiniz.")
+            
+            # --- DÜZELTİLEN YAZI 2 ---
+            st.success("Tüm hesaplamalar başarıyla tamamlandı! Tabloları aşağıdan inceleyebilirsiniz.")
             
             st.markdown("### 📋 A Şıkkı: Nominal Yükleme (SIL) Tablosu")
             df_A = pd.DataFrame(sonuclar_A)
