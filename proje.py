@@ -138,11 +138,43 @@ with tab1:
 with tab2:
     st.markdown("## 📊 Kısım 2: Grup 7 Hat ve Sistem Hesaplamaları")
     
-    # --- GRUP 7 SABİTLERİ ---
+    # --- GRUP 7 DİNAMİK FİZİKSEL SABİT HESAPLAMALARI ---
     f = 50.0; w = 2 * np.pi * f
-    R_drake, L_drake, C_drake = 0.0405, 0.582e-3, 19.85e-9  
-    R_rail, L_rail, C_rail = 0.03417, 0.9982e-3, 11.40e-9   
+    epsilon_0 = 8.854e-12
+
+    def dist(p1, p2):
+        return math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)
+
+    # 154 kV - TA1 Çift Devre (Drake) Dinamik Hesaplaması
+    cap_mm_d = 28.14; GMR_mm_d = 11.38; R_ac_ohm_km_d = 0.0715
+    r_d = (cap_mm_d / 2) / 1000; Ds_d = GMR_mm_d / 1000
+    A_kord = (-3.5, 8.3);  C_prime = (3.5, 8.3)
+    B_kord = (-4.7, 4.15); B_prime = (4.7, 4.15)
+    C_kord = (-3.7, 0.0);  A_prime = (3.7, 0.0)
+    D_AA = dist(A_kord, A_prime); D_BB = dist(B_kord, B_prime); D_CC = dist(C_kord, C_prime)
+    gmr_L_eq_d = (math.sqrt(Ds_d*D_AA) * math.sqrt(Ds_d*D_BB) * math.sqrt(Ds_d*D_CC))**(1/3)
+    gmr_C_eq_d = (math.sqrt(r_d*D_AA) * math.sqrt(r_d*D_BB) * math.sqrt(r_d*D_CC))**(1/3)
+    D_ABeq = (dist(A_kord, B_kord) * dist(A_kord, B_prime) * dist(A_prime, B_kord) * dist(A_prime, B_prime))**0.25
+    D_BCeq = (dist(B_kord, C_kord) * dist(B_kord, C_prime) * dist(B_prime, C_kord) * dist(B_prime, C_prime))**0.25
+    D_CAeq = (dist(C_kord, A_kord) * dist(C_kord, A_prime) * dist(C_prime, A_kord) * dist(C_prime, A_prime))**0.25
+    GMD_d = (D_ABeq * D_BCeq * D_CAeq)**(1/3)
     
+    R_drake = R_ac_ohm_km_d / 2
+    L_drake = (0.2 * math.log(GMD_d / gmr_L_eq_d)) * 1e-3
+    C_drake = (((2 * math.pi * epsilon_0) / math.log(GMD_d / gmr_C_eq_d)) * 1000 * 1e9) * 1e-9
+
+    # 400 kV - 3B1 Tek Devre 2'li Demet (Rail) Dinamik Hesaplaması
+    cap_mm_r = 29.59; GMR_mm_r = 11.76; R_ac_ohm_km_r = 0.0722; d_demet_r = 0.45
+    r_r = (cap_mm_r / 2) / 1000; Ds_r = GMR_mm_r / 1000
+    D_ab = 8.5; D_bc = 8.5; D_ca = 17.0
+    GMD_r = (D_ab * D_bc * D_ca)**(1/3)
+    gmr_L_eq_r = math.sqrt(Ds_r * d_demet_r)
+    gmr_C_eq_r = math.sqrt(r_r * d_demet_r)
+    
+    R_rail = R_ac_ohm_km_r / 2
+    L_rail = (0.2 * math.log(GMD_r / gmr_L_eq_r)) * 1e-3
+    C_rail = (((2 * math.pi * epsilon_0) / math.log(GMD_r / gmr_C_eq_r)) * 1000 * 1e9) * 1e-9
+
     # -------------------------------------------------------------------------
     # BÖLÜM 2.1: MANUEL KULLANICI GİRİŞLİ TEKİL ANALİZ 
     # -------------------------------------------------------------------------
@@ -231,7 +263,6 @@ with tab2:
 
         fig_m, ax_m = plt.subplots(2, 2, figsize=(16, 12))
         
-        # Grafiklerde listeler ters çevrildi [::-1] böylece x=0 noktası Hat Başı oldu
         ax_m[0, 0].plot(x_vals_m, v_list_m[::-1], '-bo', lw=2, markersize=6)
         ax_m[0, 0].set_title("Gerilim Değişimi (10 Nokta)")
         ax_m[0, 0].set_xlabel("Hat Başından Uzaklık (km)")
@@ -421,7 +452,6 @@ with tab2:
 
                 fig, ax = plt.subplots(2, 2, figsize=(16, 12))
                 
-                # Grafiklerde listeler ters çevrildi [::-1] böylece x=0 noktası Hat Başı oldu
                 ax[0, 0].plot(x_vals, v_list[::-1], '-bo', lw=2, markersize=6); ax[0, 0].set_title("Gerilim Değişimi (10 Nokta)"); ax[0, 0].set_xlabel("Hat Başından Uzaklık (km)"); ax[0, 0].set_ylabel("Gerilim (kV)"); ax[0, 0].grid(True)
                 ax[0, 1].plot(x_vals, p_list[::-1], '-go', lw=2, markersize=6); ax[0, 1].set_title("Aktif Güç Değişimi (10 Nokta)"); ax[0, 1].set_xlabel("Hat Başından Uzaklık (km)"); ax[0, 1].set_ylabel("Aktif Güç (MW)"); ax[0, 1].grid(True)
                 ax[1, 0].plot(x_vals, q_list[::-1], '-ro', lw=2, markersize=6); ax[1, 0].set_title("Reaktif Güç Değişimi (10 Nokta)"); ax[1, 0].set_xlabel("Hat Başından Uzaklık (km)"); ax[1, 0].set_ylabel("Reaktif Güç (MVAr)"); ax[1, 0].grid(True)
