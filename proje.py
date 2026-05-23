@@ -211,11 +211,15 @@ with tab2:
 
         V1_m = A_m*V2_m + B_m*I2_m
         I1_m = C_param_m*V2_m + D_m*I2_m
+        
+        # Hat başı güç ve güç katsayısı hesaplama
+        S1_m = 3 * V1_m * np.conj(I1_m)
+        pf_S_m = S1_m.real / abs(S1_m)
 
         U1_kV_m = abs(V1_m) * np.sqrt(3) / 1000
         I1_A_m = abs(I1_m)
-        P1_MW_m = (3 * V1_m * np.conj(I1_m)).real / 1e6
-        Q1_MVAr_m = (3 * V1_m * np.conj(I1_m)).imag / 1e6
+        P1_MW_m = S1_m.real / 1e6
+        Q1_MVAr_m = S1_m.imag / 1e6
         verim_m = (P2_m / (P1_MW_m * 1e6)) * 100
         reg_m = (((abs(V1_m)/abs(A_m)) - V2_m) / V2_m) * 100
 
@@ -234,7 +238,7 @@ with tab2:
         m2.metric("Hat Başı Akımı (I1)", f"{round(I1_A_m, 2)} A")
         m3.metric("Aktif Güç (P1)", f"{round(P1_MW_m, 2)} MW")
         m4.metric("Hat Verimi", f"% {round(verim_m, 2)}")
-        st.write(f"**Regülasyon:** % {round(reg_m, 2)} | **Reaktif Güç:** {round(Q1_MVAr_m, 2)} MVAr | **Güç Katsayısı:** {manuel_pf}")
+        st.write(f"**Regülasyon:** % {round(reg_m, 2)} | **Reaktif Güç:** {round(Q1_MVAr_m, 2)} MVAr | **Hat Başı Güç Katsayısı:** {round(pf_S_m, 3)}")
 
         st.markdown("#### Hat Boyunca Değişim ve P-V Burun Eğrisi Grafikleri")
         x_vals_m = np.linspace(0, manuel_l, 101)
@@ -360,9 +364,12 @@ with tab2:
                 
                 V1 = A*V2 + B*I2; I1 = C_param*V2 + D*I2
                 
+                # Hat başı güç ve güç katsayısı
+                S1 = 3 * V1 * np.conj(I1)
+                pf_S = S1.real / abs(S1)
+
                 U1_kV = abs(V1) * np.sqrt(3) / 1000
                 I1_A = abs(I1)
-                S1 = 3 * V1 * np.conj(I1)
                 P1_MW = S1.real / 1e6; Q1_MVAr = S1.imag / 1e6
                 verim = (P2 / S1.real) * 100
                 V2_bosta = abs(V1) / abs(A)
@@ -372,7 +379,7 @@ with tab2:
                     "Koşul": f"{k_no}", "Gerilim / İletken": f"{iletken}", "Uzunluk": f"{l} km",
                     "Güç Katsayısı": f"{pf} {pf_str}", "Hat Başı Gerilimi U1 (kV)": round(U1_kV, 2),
                     "Hat Başı Akımı I1 (A)": round(I1_A, 2), "Aktif Güç P1 (MW)": round(P1_MW, 2),
-                    "Reaktif Güç Q1 (MVAr)": round(Q1_MVAr, 2), "Verim (%)": round(verim, 2), "Regülasyon (%)": round(reg, 2)
+                    "Reaktif Güç Q1 (MVAr)": round(Q1_MVAr, 2), "Hat Başı pf": round(pf_S, 3), "Verim (%)": round(verim, 2), "Regülasyon (%)": round(reg, 2)
                 })
                 
                 for comp_ratio in [0.30, 0.50]:
@@ -398,7 +405,7 @@ with tab2:
                     "k_no": k_no, "iletken": iletken, "l": l, "pf": pf, "pf_str": pf_str,
                     "gamma": gamma, "Zc": Zc, "V2": V2, "I2": I2, "C_param": C_param, 
                     "A": A, "B": B, "D": D, "S2_VA": S2_VA, "Q_sign": Q_sign,
-                    "U1_kV": U1_kV, "I1_A": I1_A, "P1_MW": P1_MW, "Q1_MVAr": Q1_MVAr, "verim": verim, "reg": reg
+                    "U1_kV": U1_kV, "I1_A": I1_A, "P1_MW": P1_MW, "Q1_MVAr": Q1_MVAr, "pf_S": pf_S, "verim": verim, "reg": reg
                 })
 
             st.success("✅ Toplu Analiz Başarıyla Tamamlandı!")
@@ -435,7 +442,7 @@ with tab2:
                 c2.metric("Hat Başı Akımı (I1)", f"{round(g_data['I1_A'], 2)} A")
                 c3.metric("Aktif Güç (P1)", f"{round(g_data['P1_MW'], 2)} MW")
                 c4.metric("Verim", f"% {round(g_data['verim'], 2)}")
-                st.write(f"**Regülasyon:** % {round(g_data['reg'], 2)} | **Reaktif Güç:** {round(g_data['Q1_MVAr'], 2)} MVAr")
+                st.write(f"**Regülasyon:** % {round(g_data['reg'], 2)} | **Reaktif Güç:** {round(g_data['Q1_MVAr'], 2)} MVAr | **Hat Başı Güç Katsayısı:** {round(g_data['pf_S'], 3)}")
                 
                 st.info(f"**Teknik Analiz:** {yorumlar[g_data['k_no']]}")
 
