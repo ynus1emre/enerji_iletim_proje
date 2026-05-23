@@ -37,7 +37,7 @@ with st.sidebar:
 
 # --- ANA EKRAN BAŞLIK ---
 st.title("⚡ Enerji İletim Hatları Hesaplama Aracı")
-st.subheader("Grup 7 Özel: 154kV Drake ve 400kV Rail Hat Analizleri")
+st.subheader("Grup 7 Özel:  Hat Analizleri")
 st.divider()
 
 # --- UYGULAMAYI SEKMELERE BÖLME ---
@@ -178,7 +178,7 @@ with tab2:
     # -------------------------------------------------------------------------
     # BÖLÜM 2.1: MANUEL KULLANICI GİRİŞLİ TEKİL ANALİZ 
     # -------------------------------------------------------------------------
-    st.markdown("### 🎛️ Tekil Senaryo Simülatörü")
+    st.markdown("### 🎛️ Tekil Senaryo ")
     with st.container():
         col_m1, col_m2 = st.columns(2)
         with col_m1:
@@ -188,7 +188,7 @@ with tab2:
             manuel_pf = st.number_input("⚡ Güç Katsayısı", value=0.95, step=0.01)
             manuel_pf_tip = st.selectbox("🔄 Katsayı Tipi", ["Endüktif", "Kapasitif"])
             
-        tekil_hesapla_btn = st.button("⚙️ Tekil Senaryoyu Hesapla", type="primary", use_container_width=True)
+        tekil_hesapla_btn = st.button("⚙️ Değerleri Hesapla", type="primary", use_container_width=True)
 
     if tekil_hesapla_btn:
         if "154" in manuel_senaryo:
@@ -227,7 +227,7 @@ with tab2:
             st.markdown("#### 📏 Uzun Hat (A,B,C,D)")
             st.code(f"A Parametresi  : {A_m.real:.5f} + j{A_m.imag:.5f}\nB Parametresi  : {B_m.real:.4f} + j{B_m.imag:.4f} ohm\nC Parametresi  : {C_param_m.real:.6f} + j{C_param_m.imag:.6f} S\nD Parametresi  : {D_m.real:.5f} + j{D_m.imag:.5f}", language="text")
 
-        st.markdown("### 📊 Hat Performans Analizi")
+        st.markdown("### 📊 Hat Değer Analizi")
         st.markdown("#### Hat Başı Değerleri ve Performans")
         m1, m2, m3, m4 = st.columns(4)
         m1.metric("Hat Başı Gerilimi (V1)", f"{round(U1_kV_m, 2)} kV")
@@ -318,7 +318,7 @@ with tab2:
     # -------------------------------------------------------------------------
     # BÖLÜM 2.2: TOPLU 7 KOŞUL ANALİZİ VE GRAFİKLER
     # -------------------------------------------------------------------------
-    st.markdown("### 📑 Grup 7 Toplu Rapor Üretici (7 Koşul)")
+    st.markdown("### 📑 Grup 7 Toplu Hesap (7 Koşul)")
     
     if st.button("🚀 Tüm 7 Koşulu Analiz Et ve Raporla", use_container_width=True, type="secondary"):
         with st.spinner("Tüm koşullar hesaplanıyor, tablolar ve grafikler oluşturuluyor..."):
