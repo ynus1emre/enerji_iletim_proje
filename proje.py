@@ -264,19 +264,19 @@ with tab2:
         fig_m, ax_m = plt.subplots(2, 2, figsize=(16, 12))
         
         ax_m[0, 0].plot(x_vals_m, v_list_m[::-1], '-bo', lw=2, markersize=6, markevery=10)
-        ax_m[0, 0].set_title("Gerilim Değişimi (10 Nokta + Pürüzsüz Eğri)")
+        ax_m[0, 0].set_title("Gerilim Değişimi ")
         ax_m[0, 0].set_xlabel("Hat Başından Uzaklık (km)")
         ax_m[0, 0].set_ylabel("Gerilim (kV)")
         ax_m[0, 0].grid(True)
 
         ax_m[0, 1].plot(x_vals_m, p_list_m[::-1], '-go', lw=2, markersize=6, markevery=10)
-        ax_m[0, 1].set_title("Aktif Güç Değişimi (10 Nokta + Pürüzsüz Eğri)")
+        ax_m[0, 1].set_title("Aktif Güç Değişimi ")
         ax_m[0, 1].set_xlabel("Hat Başından Uzaklık (km)")
         ax_m[0, 1].set_ylabel("Aktif Güç (MW)")
         ax_m[0, 1].grid(True)
 
         ax_m[1, 0].plot(x_vals_m, q_list_m[::-1], '-ro', lw=2, markersize=6, markevery=10)
-        ax_m[1, 0].set_title("Reaktif Güç Değişimi (10 Nokta + Pürüzsüz Eğri)")
+        ax_m[1, 0].set_title("Reaktif Güç Değişimi ")
         ax_m[1, 0].set_xlabel("Hat Başından Uzaklık (km)")
         ax_m[1, 0].set_ylabel("Reaktif Güç (MVAr)")
         ax_m[1, 0].grid(True)
