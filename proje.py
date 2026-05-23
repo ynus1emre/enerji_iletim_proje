@@ -233,7 +233,7 @@ with tab2:
     # -------------------------------------------------------------------------
     # BÖLÜM 2.2: TOPLU 7 KOŞUL ANALİZİ VE GRAFİKLER
     # -------------------------------------------------------------------------
-    st.markdown("### 📑 Grup 7 Toplu Rapor Üretici (7 Koşul)")
+    st.markdown("### 📑 Grup 7 Toplu Hat Hesabı (7 Koşul)")
     
     if st.button("🚀 Tüm 7 Koşulu Analiz Et ve Raporla", use_container_width=True, type="primary"):
         with st.spinner("Tüm koşullar hesaplanıyor, tablolar ve grafikler oluşturuluyor..."):
