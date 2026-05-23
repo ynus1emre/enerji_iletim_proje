@@ -237,7 +237,9 @@ with tab2:
         st.write(f"**Regülasyon:** % {round(reg_m, 2)} | **Reaktif Güç:** {round(Q1_MVAr_m, 2)} MVAr | **Güç Katsayısı:** {manuel_pf}")
 
         st.markdown("#### Hat Boyunca Değişim ve P-V Burun Eğrisi Grafikleri")
-        x_vals_m = np.linspace(0, manuel_l, 11)
+        
+        # 101 nokta ile pürüzsüz hesaplama, 10 aralıklı markevery ile şık gösterim
+        x_vals_m = np.linspace(0, manuel_l, 101)
         v_list_m, p_list_m, q_list_m = [], [], []
         
         for x in x_vals_m:
@@ -251,7 +253,8 @@ with tab2:
             p_list_m.append((3 * Vx_ara * np.conj(Ix_ara)).real / 1e6)
             q_list_m.append((3 * Vx_ara * np.conj(Ix_ara)).imag / 1e6)
 
-        k_loads_m = np.linspace(0.1, 1.5, 15)
+        # 71 nokta ile P-V hesaplaması, 5 aralıklı markevery ile detaylı burun eğrisi
+        k_loads_m = np.linspace(0.1, 1.5, 71)
         P1_curve_m, V1_curve_m = [], []
         for k_l in k_loads_m:
             S2_step_m = k_l * S2_VA_m
@@ -263,25 +266,26 @@ with tab2:
 
         fig_m, ax_m = plt.subplots(2, 2, figsize=(16, 12))
         
-        ax_m[0, 0].plot(x_vals_m, v_list_m[::-1], '-bo', lw=2, markersize=6)
-        ax_m[0, 0].set_title("Gerilim Değişimi (10 Nokta)")
+        # Pürüzsüz çizgiler + 10 Nokta İşaretçisi (markevery=10)
+        ax_m[0, 0].plot(x_vals_m, v_list_m[::-1], '-bo', lw=2, markersize=6, markevery=10)
+        ax_m[0, 0].set_title("Gerilim Değişimi (10 Nokta + Pürüzsüz Eğri)")
         ax_m[0, 0].set_xlabel("Hat Başından Uzaklık (km)")
         ax_m[0, 0].set_ylabel("Gerilim (kV)")
         ax_m[0, 0].grid(True)
 
-        ax_m[0, 1].plot(x_vals_m, p_list_m[::-1], '-go', lw=2, markersize=6)
-        ax_m[0, 1].set_title("Aktif Güç Değişimi (10 Nokta)")
+        ax_m[0, 1].plot(x_vals_m, p_list_m[::-1], '-go', lw=2, markersize=6, markevery=10)
+        ax_m[0, 1].set_title("Aktif Güç Değişimi (10 Nokta + Pürüzsüz Eğri)")
         ax_m[0, 1].set_xlabel("Hat Başından Uzaklık (km)")
         ax_m[0, 1].set_ylabel("Aktif Güç (MW)")
         ax_m[0, 1].grid(True)
 
-        ax_m[1, 0].plot(x_vals_m, q_list_m[::-1], '-ro', lw=2, markersize=6)
-        ax_m[1, 0].set_title("Reaktif Güç Değişimi (10 Nokta)")
+        ax_m[1, 0].plot(x_vals_m, q_list_m[::-1], '-ro', lw=2, markersize=6, markevery=10)
+        ax_m[1, 0].set_title("Reaktif Güç Değişimi (10 Nokta + Pürüzsüz Eğri)")
         ax_m[1, 0].set_xlabel("Hat Başından Uzaklık (km)")
         ax_m[1, 0].set_ylabel("Reaktif Güç (MVAr)")
         ax_m[1, 0].grid(True)
 
-        ax_m[1, 1].plot(P1_curve_m, V1_curve_m, '-k*', lw=2, markersize=8)
+        ax_m[1, 1].plot(P1_curve_m, V1_curve_m, '-k*', lw=2, markersize=8, markevery=5)
         ax_m[1, 1].set_title("P-V Burun Eğrisi")
         ax_m[1, 1].set_xlabel("Hat Başı Aktif Gücü P1 (MW)")
         ax_m[1, 1].set_ylabel("Hat Başı Gerilimi V1 (kV)")
@@ -433,7 +437,8 @@ with tab2:
                 
                 st.info(f"**Teknik Analiz:** {yorumlar[g_data['k_no']]}")
 
-                x_vals = np.linspace(0, g_data['l'], 11)
+                # 101 nokta hesaplaması + markevery=10
+                x_vals = np.linspace(0, g_data['l'], 101)
                 v_list, p_list, q_list = [], [], []
                 for x in x_vals:
                     Ax = np.cosh(g_data['gamma'] * x); Bx = g_data['Zc'] * np.sinh(g_data['gamma'] * x); Cx = (1/g_data['Zc']) * np.sinh(g_data['gamma'] * x)
@@ -442,7 +447,8 @@ with tab2:
                     p_list.append((3 * Vx_ara * np.conj(Ix_ara)).real / 1e6)
                     q_list.append((3 * Vx_ara * np.conj(Ix_ara)).imag / 1e6)
 
-                k_loads = np.linspace(0.1, 1.5, 15)
+                # 71 nokta hesaplaması + markevery=5
+                k_loads = np.linspace(0.1, 1.5, 71)
                 P1_curve, V1_curve = [], []
                 for k_l in k_loads:
                     S2_step = k_l * g_data['S2_VA']
@@ -452,9 +458,9 @@ with tab2:
 
                 fig, ax = plt.subplots(2, 2, figsize=(16, 12))
                 
-                ax[0, 0].plot(x_vals, v_list[::-1], '-bo', lw=2, markersize=6); ax[0, 0].set_title("Gerilim Değişimi (10 Nokta)"); ax[0, 0].set_xlabel("Hat Başından Uzaklık (km)"); ax[0, 0].set_ylabel("Gerilim (kV)"); ax[0, 0].grid(True)
-                ax[0, 1].plot(x_vals, p_list[::-1], '-go', lw=2, markersize=6); ax[0, 1].set_title("Aktif Güç Değişimi (10 Nokta)"); ax[0, 1].set_xlabel("Hat Başından Uzaklık (km)"); ax[0, 1].set_ylabel("Aktif Güç (MW)"); ax[0, 1].grid(True)
-                ax[1, 0].plot(x_vals, q_list[::-1], '-ro', lw=2, markersize=6); ax[1, 0].set_title("Reaktif Güç Değişimi (10 Nokta)"); ax[1, 0].set_xlabel("Hat Başından Uzaklık (km)"); ax[1, 0].set_ylabel("Reaktif Güç (MVAr)"); ax[1, 0].grid(True)
-                ax[1, 1].plot(P1_curve, V1_curve, '-k*', lw=2, markersize=8); ax[1, 1].set_title("P-V Burun Eğrisi"); ax[1, 1].set_xlabel("Hat Başı Aktif Gücü P1 (MW)"); ax[1, 1].set_ylabel("Hat Başı Gerilimi V1 (kV)"); ax[1, 1].grid(True)
+                ax[0, 0].plot(x_vals, v_list[::-1], '-bo', lw=2, markersize=6, markevery=10); ax[0, 0].set_title("Gerilim Değişimi (10 Nokta + Pürüzsüz Eğri)"); ax[0, 0].set_xlabel("Hat Başından Uzaklık (km)"); ax[0, 0].set_ylabel("Gerilim (kV)"); ax[0, 0].grid(True)
+                ax[0, 1].plot(x_vals, p_list[::-1], '-go', lw=2, markersize=6, markevery=10); ax[0, 1].set_title("Aktif Güç Değişimi (10 Nokta + Pürüzsüz Eğri)"); ax[0, 1].set_xlabel("Hat Başından Uzaklık (km)"); ax[0, 1].set_ylabel("Aktif Güç (MW)"); ax[0, 1].grid(True)
+                ax[1, 0].plot(x_vals, q_list[::-1], '-ro', lw=2, markersize=6, markevery=10); ax[1, 0].set_title("Reaktif Güç Değişimi (10 Nokta + Pürüzsüz Eğri)"); ax[1, 0].set_xlabel("Hat Başından Uzaklık (km)"); ax[1, 0].set_ylabel("Reaktif Güç (MVAr)"); ax[1, 0].grid(True)
+                ax[1, 1].plot(P1_curve, V1_curve, '-k*', lw=2, markersize=8, markevery=5); ax[1, 1].set_title("P-V Burun Eğrisi"); ax[1, 1].set_xlabel("Hat Başı Aktif Gücü P1 (MW)"); ax[1, 1].set_ylabel("Hat Başı Gerilimi V1 (kV)"); ax[1, 1].grid(True)
                 
                 plt.tight_layout(); st.pyplot(fig); st.markdown("<br>", unsafe_allow_html=True)
