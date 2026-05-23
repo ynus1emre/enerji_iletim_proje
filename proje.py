@@ -204,7 +204,6 @@ with tab2:
         m4.metric("Hat Verimi", f"% {round(verim_m, 2)}")
         st.write(f"**Regülasyon:** % {round(reg_m, 2)} | **Reaktif Güç:** {round(Q1_MVAr_m, 2)} MVAr | **Güç Katsayısı:** {manuel_pf}")
 
-        # Tekil Senaryo P-V Eğrisi Hesaplamaları Eklendi
         st.markdown("#### Hat Boyunca Değişim ve P-V Burun Eğrisi Grafikleri")
         x_vals_m = np.linspace(0, manuel_l, 11)
         v_list_m, p_list_m, q_list_m = [], [], []
@@ -232,19 +231,20 @@ with tab2:
 
         fig_m, ax_m = plt.subplots(2, 2, figsize=(16, 12))
         
-        ax_m[0, 0].plot(x_vals_m, v_list_m, '-bo', lw=2, markersize=6)
+        # Grafiklerde listeler ters çevrildi [::-1] böylece x=0 noktası Hat Başı oldu
+        ax_m[0, 0].plot(x_vals_m, v_list_m[::-1], '-bo', lw=2, markersize=6)
         ax_m[0, 0].set_title("Gerilim Değişimi (10 Nokta)")
         ax_m[0, 0].set_xlabel("Hat Başından Uzaklık (km)")
         ax_m[0, 0].set_ylabel("Gerilim (kV)")
         ax_m[0, 0].grid(True)
 
-        ax_m[0, 1].plot(x_vals_m, p_list_m, '-go', lw=2, markersize=6)
+        ax_m[0, 1].plot(x_vals_m, p_list_m[::-1], '-go', lw=2, markersize=6)
         ax_m[0, 1].set_title("Aktif Güç Değişimi (10 Nokta)")
         ax_m[0, 1].set_xlabel("Hat Başından Uzaklık (km)")
         ax_m[0, 1].set_ylabel("Aktif Güç (MW)")
         ax_m[0, 1].grid(True)
 
-        ax_m[1, 0].plot(x_vals_m, q_list_m, '-ro', lw=2, markersize=6)
+        ax_m[1, 0].plot(x_vals_m, q_list_m[::-1], '-ro', lw=2, markersize=6)
         ax_m[1, 0].set_title("Reaktif Güç Değişimi (10 Nokta)")
         ax_m[1, 0].set_xlabel("Hat Başından Uzaklık (km)")
         ax_m[1, 0].set_ylabel("Reaktif Güç (MVAr)")
@@ -393,7 +393,6 @@ with tab2:
             for g_data in grafik_datalari:
                 st.markdown(f"#### 🔹 Koşul {g_data['k_no']}: {g_data['iletken']}, {g_data['l']}km, {g_data['pf']} {g_data['pf_str']}")
                 
-                # Her koşulun altına metrikleri ekledim
                 c1, c2, c3, c4 = st.columns(4)
                 c1.metric("Hat Başı Gerilimi (V1)", f"{round(g_data['U1_kV'], 2)} kV")
                 c2.metric("Hat Başı Akımı (I1)", f"{round(g_data['I1_A'], 2)} A")
@@ -421,8 +420,11 @@ with tab2:
                     V1_curve.append(abs(V1_step) * np.sqrt(3) / 1000); P1_curve.append((3 * V1_step * np.conj(I1_step)).real / 1e6)
 
                 fig, ax = plt.subplots(2, 2, figsize=(16, 12))
-                ax[0, 0].plot(x_vals, v_list, '-bo', lw=2, markersize=6); ax[0, 0].set_title("Gerilim Değişimi (10 Nokta)"); ax[0, 0].set_xlabel("Hat Başından Uzaklık (km)"); ax[0, 0].set_ylabel("Gerilim (kV)"); ax[0, 0].grid(True)
-                ax[0, 1].plot(x_vals, p_list, '-go', lw=2, markersize=6); ax[0, 1].set_title("Aktif Güç Değişimi (10 Nokta)"); ax[0, 1].set_xlabel("Hat Başından Uzaklık (km)"); ax[0, 1].set_ylabel("Aktif Güç (MW)"); ax[0, 1].grid(True)
-                ax[1, 0].plot(x_vals, q_list, '-ro', lw=2, markersize=6); ax[1, 0].set_title("Reaktif Güç Değişimi (10 Nokta)"); ax[1, 0].set_xlabel("Hat Başından Uzaklık (km)"); ax[1, 0].set_ylabel("Reaktif Güç (MVAr)"); ax[1, 0].grid(True)
+                
+                # Grafiklerde listeler ters çevrildi [::-1] böylece x=0 noktası Hat Başı oldu
+                ax[0, 0].plot(x_vals, v_list[::-1], '-bo', lw=2, markersize=6); ax[0, 0].set_title("Gerilim Değişimi (10 Nokta)"); ax[0, 0].set_xlabel("Hat Başından Uzaklık (km)"); ax[0, 0].set_ylabel("Gerilim (kV)"); ax[0, 0].grid(True)
+                ax[0, 1].plot(x_vals, p_list[::-1], '-go', lw=2, markersize=6); ax[0, 1].set_title("Aktif Güç Değişimi (10 Nokta)"); ax[0, 1].set_xlabel("Hat Başından Uzaklık (km)"); ax[0, 1].set_ylabel("Aktif Güç (MW)"); ax[0, 1].grid(True)
+                ax[1, 0].plot(x_vals, q_list[::-1], '-ro', lw=2, markersize=6); ax[1, 0].set_title("Reaktif Güç Değişimi (10 Nokta)"); ax[1, 0].set_xlabel("Hat Başından Uzaklık (km)"); ax[1, 0].set_ylabel("Reaktif Güç (MVAr)"); ax[1, 0].grid(True)
                 ax[1, 1].plot(P1_curve, V1_curve, '-k*', lw=2, markersize=8); ax[1, 1].set_title("P-V Burun Eğrisi"); ax[1, 1].set_xlabel("Hat Başı Aktif Gücü P1 (MW)"); ax[1, 1].set_ylabel("Hat Başı Gerilimi V1 (kV)"); ax[1, 1].grid(True)
+                
                 plt.tight_layout(); st.pyplot(fig); st.markdown("<br>", unsafe_allow_html=True)
