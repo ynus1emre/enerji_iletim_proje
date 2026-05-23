@@ -44,7 +44,7 @@ st.divider()
 tab1, tab2 = st.tabs(["🧮 Kısım 1: Hat Parametre Hesapları", "📊 Kısım 2: Grup 7 Hat ve Sistem Hesaplamaları"])
 
 # ==========================================
-# SEKME 1: TEKİL HESAPLAYICI (KISIM 1) - HİÇ DOKUNULMADI
+# SEKME 1: TEKİL HESAPLAYICI (KISIM 1) - DOKUNULMADI
 # ==========================================
 with tab1:
     freq = 50.0
@@ -132,13 +132,12 @@ with tab1:
                     f"C Parametresi  : {C_param.real:.6f} + j{C_param.imag:.6f} S\n"
                     f"D Parametresi  : {D.real:.5f} + j{D.imag:.5f}", language="text")
 
-
 # ==========================================
-# SEKME 2: GRUP 7 PROJE KISIM 2 (TOPLU TABLOLAR VE GRAFİKLER)
+# SEKME 2: GRUP 7 PROJE KISIM 2 (TAMAMLANMIŞ SÜRÜM)
 # ==========================================
 with tab2:
     st.markdown("### 🎯 Kısım 2: Grup 7 Toplu Hat ve Sistem Analizleri")
-    st.info("Bu modül, Grup 7'ye özel tahsis edilen 154kV (Drake) ve 400kV (Rail) 7 adet koşulu aynı anda hesaplar, ana tabloları oluşturur (Hat Başı Akımı I1 dahil) ve her bir koşul için detaylı P-V / Gerilim grafiklerini teknik yorumlarıyla birlikte listeler.")
+    st.info("Bu modül, Grup 7'ye özel tahsis edilen 7 adet koşulu aynı anda hesaplar, ana tabloları oluşturur (Hat Başı Akımı I1 dahil) ve her bir koşul için P-V Burun Eğrisi ile 10 noktalı profil grafiklerini çizer.")
     
     if st.button("🚀 Tüm 7 Koşulu Analiz Et ve Raporla", use_container_width=True, type="primary"):
         with st.spinner("Tüm koşullar hesaplanıyor, tablolar ve grafikler oluşturuluyor..."):
@@ -147,15 +146,15 @@ with tab2:
             R_drake, L_drake, C_drake = 0.0405, 0.582e-3, 19.85e-9  
             R_rail, L_rail, C_rail = 0.03417, 0.9982e-3, 11.40e-9   
             
-            # Format: (Koşul No, Gerilim(kV), Uzunluk(km), Güç Katsayısı, 1=Kapasitif / -1=Endüktif, İletken)
+            # Tam istediğin teknik isimlendirmelerle güncellendi
             kosullar = [
-                (1, 154, 100, 0.95, -1, "Drake (Çift)"),
-                (2, 154, 150, 0.95, 1, "Drake (Çift)"),
-                (3, 154, 100, 0.95, 1, "Drake (Çift)"),
-                (4, 400, 200, 0.85, 1, "Rail (Tek 2'li)"),
-                (5, 400, 250, 0.85, 1, "Rail (Tek 2'li)"),
-                (6, 400, 200, 0.85, -1, "Rail (Tek 2'li)"),
-                (7, 400, 250, 0.85, -1, "Rail (Tek 2'li)")
+                (1, 154, 100, 0.95, -1, "154 kV - TA1 Çift Devre (Drake)"),
+                (2, 154, 150, 0.95, 1, "154 kV - TA1 Çift Devre (Drake)"),
+                (3, 154, 100, 0.95, 1, "154 kV - TA1 Çift Devre (Drake)"),
+                (4, 400, 200, 0.85, 1, "400 kV - 3B1 Tek Devre 2'li Demet (Rail)"),
+                (5, 400, 250, 0.85, 1, "400 kV - 3B1 Tek Devre 2'li Demet (Rail)"),
+                (6, 400, 200, 0.85, -1, "400 kV - 3B1 Tek Devre 2'li Demet (Rail)"),
+                (7, 400, 250, 0.85, -1, "400 kV - 3B1 Tek Devre 2'li Demet (Rail)")
             ]
             
             sonuclar_A = []
@@ -185,7 +184,6 @@ with tab2:
                 C_param = (1/Zc) * np.sinh(gamma * l)
                 D = A
                 
-                # A Şıkkı Hesaplamaları
                 Z_sur = np.sqrt(L/C)
                 S2_VA = (U2**2) / Z_sur
                 P2 = S2_VA * pf
@@ -204,10 +202,9 @@ with tab2:
                 V2_bosta = abs(V1) / abs(A)
                 reg = ((V2_bosta - V2) / V2) * 100
                 
-                # Tablo A için veri ekleme (Hat Başı Akımı dahil)
                 sonuclar_A.append({
                     "Koşul": f"{k_no}",
-                    "Gerilim / İletken": f"{U2_kV}kV / {iletken}",
+                    "Gerilim / İletken": f"{iletken}",
                     "Uzunluk": f"{l} km",
                     "Güç Katsayısı": f"{pf} {pf_str}",
                     "Hat Başı Gerilimi U1 (kV)": round(U1_kV, 2),
@@ -218,7 +215,6 @@ with tab2:
                     "Regülasyon (%)": round(reg, 2)
                 })
                 
-                # D Şıkkı Hesaplamaları (Kompanzasyon)
                 for comp_ratio in [0.30, 0.50]:
                     X_L = w*L
                     X_C_comp = comp_ratio * X_L
@@ -249,13 +245,13 @@ with tab2:
                             "Regülasyon (%)": round(reg_c, 2)
                         })
 
-                # Grafikler için veriyi sakla
                 grafik_datalari.append({
                     "k_no": k_no, "U2_kV": U2_kV, "iletken": iletken, "l": l, "pf": pf, "pf_str": pf_str,
-                    "pf_type": pf_type, "gamma": gamma, "Zc": Zc, "V2": V2, "I2": I2, "C_param": C_param, "A": A
+                    "pf_type": pf_type, "gamma": gamma, "Zc": Zc, "V2": V2, "I2": I2, "C_param": C_param, 
+                    "A": A, "B": B, "D": D, "S2_VA": S2_VA, "Q_sign": Q_sign
                 })
 
-            # --- 1. KISIM: DEV TABLOLARIN EKRANA BASILMASI ---
+            # --- DEV TABLOLAR ---
             st.success("✅ Tüm hesaplamalar başarıyla tamamlandı!")
             
             st.markdown("### 📋 A Şıkkı: Nominal Yükleme (SIL) Tablosu")
@@ -268,18 +264,17 @@ with tab2:
             
             st.divider()
 
-            # --- 2. KISIM: HER KOŞUL İÇİN ÖZEL GRAFİK VE YORUMLAR ---
-            st.markdown("### 📉 Koşullara Özel Değişim Grafikleri ve Mühendislik Yorumları")
+            # --- GRAFİKLER (10 NOKTA VE P-V EĞRİSİ DAHİL) ---
+            st.markdown("### 📉 Koşullara Özel Değişim ve P-V Burun Eğrisi Grafikleri")
             
             for g_data in grafik_datalari:
-                st.markdown(f"#### 🔹 Koşul {g_data['k_no']}: {g_data['U2_kV']}kV, {g_data['iletken']}, {g_data['l']}km, {g_data['pf']} {g_data['pf_str']}")
+                st.markdown(f"#### 🔹 Koşul {g_data['k_no']}: {g_data['iletken']}, {g_data['l']}km, {g_data['pf']} {g_data['pf_str']}")
                 
-                # Yorum Kutusu
-                yorum_metni = "Ferranti etkisi (kapasitif reaktansın baskın olması) nedeniyle hat sonu gerilimi hat başından yüksek çıkmış ve negatif regülasyon oluşmuştur." if g_data['pf_type'] == 1 else "Endüktif güç çekimi nedeniyle hat boyunca gerilim düşümü yaşanmış ve pozitif regülasyon oluşmuştur."
-                st.info(f"**Teknik Analiz:** Seçilen {g_data['iletken']} hattı, {g_data['l']} km mesafede {g_data['pf_str']} yük karakteristiği göstermektedir. {yorum_metni}")
+                yorum_metni = "Kapasitif etki baskın olduğu için hat sonunda gerilim artışı (Ferranti) görülmüştür." if g_data['pf_type'] == 1 else "Endüktif etki nedeniyle hat boyunca gerilim düşümü yaşanmıştır."
+                st.info(f"**Teknik Analiz:** {yorum_metni}")
 
-                # 3'lü Değişim Grafiği (B ve C Şıkları Harmanlanmış)
-                x_vals = np.linspace(0, g_data['l'], 50)
+                # Tam 10 nokta (11 adım) için mesafe hesaplamaları
+                x_vals = np.linspace(0, g_data['l'], 11)
                 v_list, p_list, q_list = [], [], []
                 
                 for x in x_vals:
@@ -293,22 +288,44 @@ with tab2:
                     p_list.append((3 * Vx_ara * np.conj(Ix_ara)).real / 1e6)
                     q_list.append((3 * Vx_ara * np.conj(Ix_ara)).imag / 1e6)
 
-                fig, ax = plt.subplots(1, 3, figsize=(18, 4))
+                # P-V Burun Eğrisi Hesaplamaları (0.1 S2 ile 1.5 S2 arası)
+                k_loads = np.linspace(0.1, 1.5, 15)
+                P1_curve, V1_curve = [], []
+                for k_l in k_loads:
+                    S2_step = k_l * g_data['S2_VA']
+                    I2_step = np.conj((complex(S2_step*g_data['pf'], g_data['Q_sign']*S2_step*np.sin(np.arccos(g_data['pf'])))) / (3*g_data['V2']))
+                    V1_step = g_data['A']*g_data['V2'] + g_data['B']*I2_step
+                    I1_step = g_data['C_param']*g_data['V2'] + g_data['D']*I2_step
+                    V1_curve.append(abs(V1_step) * np.sqrt(3) / 1000)
+                    P1_curve.append((3 * V1_step * np.conj(I1_step)).real / 1e6)
+
+                # 4'lü Grafik Paneli (2x2) - Marker='o' ile 10 nokta belirginleştirildi
+                fig, ax = plt.subplots(2, 2, figsize=(16, 12))
                 
-                ax[0].plot(x_vals, v_list, 'b', lw=2)
-                ax[0].set_title("Gerilim Değişimi (kV)")
-                ax[0].set_xlabel("Hat Başından Uzaklık (km)")
-                ax[0].grid(True)
+                ax[0, 0].plot(x_vals, v_list, '-bo', lw=2, markersize=6)
+                ax[0, 0].set_title("Gerilim Değişimi (10 Nokta)")
+                ax[0, 0].set_xlabel("Hat Başından Uzaklık (km)")
+                ax[0, 0].set_ylabel("Gerilim (kV)")
+                ax[0, 0].grid(True)
 
-                ax[1].plot(x_vals, p_list, 'g', lw=2)
-                ax[1].set_title("Aktif Güç Değişimi (MW)")
-                ax[1].set_xlabel("Hat Başından Uzaklık (km)")
-                ax[1].grid(True)
+                ax[0, 1].plot(x_vals, p_list, '-go', lw=2, markersize=6)
+                ax[0, 1].set_title("Aktif Güç Değişimi (10 Nokta)")
+                ax[0, 1].set_xlabel("Hat Başından Uzaklık (km)")
+                ax[0, 1].set_ylabel("Aktif Güç (MW)")
+                ax[0, 1].grid(True)
 
-                ax[2].plot(x_vals, q_list, 'r', lw=2)
-                ax[2].set_title("Reaktif Güç Değişimi (MVAr)")
-                ax[2].set_xlabel("Hat Başından Uzaklık (km)")
-                ax[2].grid(True)
+                ax[1, 0].plot(x_vals, q_list, '-ro', lw=2, markersize=6)
+                ax[1, 0].set_title("Reaktif Güç Değişimi (10 Nokta)")
+                ax[1, 0].set_xlabel("Hat Başından Uzaklık (km)")
+                ax[1, 0].set_ylabel("Reaktif Güç (MVAr)")
+                ax[1, 0].grid(True)
 
+                ax[1, 1].plot(P1_curve, V1_curve, '-k*', lw=2, markersize=8)
+                ax[1, 1].set_title("P-V Burun Eğrisi")
+                ax[1, 1].set_xlabel("Hat Başı Aktif Gücü P1 (MW)")
+                ax[1, 1].set_ylabel("Hat Başı Gerilimi V1 (kV)")
+                ax[1, 1].grid(True)
+
+                plt.tight_layout()
                 st.pyplot(fig)
                 st.markdown("<br>", unsafe_allow_html=True)
