@@ -37,7 +37,7 @@ with st.sidebar:
 
 # --- ANA EKRAN BAŞLIK ---
 st.title("⚡ Enerji İletim Hatları Hesaplama Aracı")
-st.subheader("Grup 7 Özel: Hat Analizleri")
+st.subheader("Grup 7 Özel: 154kV Drake ve 400kV Rail Hat Analizleri")
 st.divider()
 
 # --- UYGULAMAYI SEKMELERE BÖLME ---
@@ -178,7 +178,7 @@ with tab2:
     # -------------------------------------------------------------------------
     # BÖLÜM 2.1: MANUEL KULLANICI GİRİŞLİ TEKİL ANALİZ 
     # -------------------------------------------------------------------------
-    st.markdown("### 🎛️ Tekil Senaryo")
+    st.markdown("### 🎛️ Tekil Senaryo Simülatörü")
     with st.container():
         col_m1, col_m2 = st.columns(2)
         with col_m1:
@@ -237,8 +237,6 @@ with tab2:
         st.write(f"**Regülasyon:** % {round(reg_m, 2)} | **Reaktif Güç:** {round(Q1_MVAr_m, 2)} MVAr | **Güç Katsayısı:** {manuel_pf}")
 
         st.markdown("#### Hat Boyunca Değişim ve P-V Burun Eğrisi Grafikleri")
-        
-        # 101 nokta ile pürüzsüz hesaplama, 10 aralıklı markevery ile şık gösterim
         x_vals_m = np.linspace(0, manuel_l, 101)
         v_list_m, p_list_m, q_list_m = [], [], []
         
@@ -253,7 +251,6 @@ with tab2:
             p_list_m.append((3 * Vx_ara * np.conj(Ix_ara)).real / 1e6)
             q_list_m.append((3 * Vx_ara * np.conj(Ix_ara)).imag / 1e6)
 
-        # 71 nokta ile P-V hesaplaması, 5 aralıklı markevery ile detaylı burun eğrisi
         k_loads_m = np.linspace(0.1, 1.5, 71)
         P1_curve_m, V1_curve_m = [], []
         for k_l in k_loads_m:
@@ -266,7 +263,6 @@ with tab2:
 
         fig_m, ax_m = plt.subplots(2, 2, figsize=(16, 12))
         
-        # Pürüzsüz çizgiler + 10 Nokta İşaretçisi (markevery=10)
         ax_m[0, 0].plot(x_vals_m, v_list_m[::-1], '-bo', lw=2, markersize=6, markevery=10)
         ax_m[0, 0].set_title("Gerilim Değişimi (10 Nokta + Pürüzsüz Eğri)")
         ax_m[0, 0].set_xlabel("Hat Başından Uzaklık (km)")
@@ -322,7 +318,7 @@ with tab2:
     # -------------------------------------------------------------------------
     # BÖLÜM 2.2: TOPLU 7 KOŞUL ANALİZİ VE GRAFİKLER
     # -------------------------------------------------------------------------
-    st.markdown("### 📑 Grup 7 Toplu Hesaplama (7 Koşul)")
+    st.markdown("### 📑 Grup 7 Toplu Rapor Üretici (7 Koşul)")
     
     if st.button("🚀 Tüm 7 Koşulu Analiz Et ve Raporla", use_container_width=True, type="secondary"):
         with st.spinner("Tüm koşullar hesaplanıyor, tablolar ve grafikler oluşturuluyor..."):
@@ -409,8 +405,14 @@ with tab2:
             st.markdown("### 📋 A Şıkkı: Nominal Yükleme (SIL) Tablosu")
             st.dataframe(pd.DataFrame(sonuclar_A), use_container_width=True)
             
-            st.markdown("### 📋 D Şıkkı: Seri Kompanzasyon Tablosu")
-            st.dataframe(pd.DataFrame(sonuclar_D), use_container_width=True)
+            # --- Seri Kompanzasyon Tablosu Ayrıldı (Koşul Koşul Gösterim) ---
+            st.markdown("### 📋 D Şıkkı: Seri Kompanzasyon Performans Tabloları")
+            df_D = pd.DataFrame(sonuclar_D)
+            for i in range(1, 8):
+                df_kosul_d = df_D[df_D["Koşul"] == str(i)]
+                if not df_kosul_d.empty:
+                    st.markdown(f"**Koşul {i} İçin Seri Kompanzasyon Sonuçları**")
+                    st.dataframe(df_kosul_d, use_container_width=True, hide_index=True)
             st.divider()
 
             st.markdown("### 📉 Koşullara Özel Değişim ve P-V Eğrileri")
@@ -437,7 +439,6 @@ with tab2:
                 
                 st.info(f"**Teknik Analiz:** {yorumlar[g_data['k_no']]}")
 
-                # 101 nokta hesaplaması + markevery=10
                 x_vals = np.linspace(0, g_data['l'], 101)
                 v_list, p_list, q_list = [], [], []
                 for x in x_vals:
@@ -447,7 +448,6 @@ with tab2:
                     p_list.append((3 * Vx_ara * np.conj(Ix_ara)).real / 1e6)
                     q_list.append((3 * Vx_ara * np.conj(Ix_ara)).imag / 1e6)
 
-                # 71 nokta hesaplaması + markevery=5
                 k_loads = np.linspace(0.1, 1.5, 71)
                 P1_curve, V1_curve = [], []
                 for k_l in k_loads:
