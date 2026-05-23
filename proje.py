@@ -44,7 +44,7 @@ st.divider()
 tab1, tab2 = st.tabs(["🧮 Kısım 1: Hat Parametre Hesapları", "📊 Kısım 2: Grup 7 Hat ve Sistem Hesaplamaları"])
 
 # ==========================================
-# SEKME 1: TEKİL HESAPLAYICI (KISIM 1) - DOKUNULMADI
+# SEKME 1: TEKİL HESAPLAYICI (KISIM 1)
 # ==========================================
 with tab1:
     freq = 50.0
@@ -158,7 +158,6 @@ with tab2:
             
         tekil_hesapla_btn = st.button("⚙️ Tekil Senaryoyu Hesapla", type="primary", use_container_width=True)
 
-    # Butona basıldığında çalışacak tekil hesaplama bloğu
     if tekil_hesapla_btn:
         if "154" in manuel_senaryo:
             R_m, L_m, C_m, U2_m = R_drake, L_drake, C_drake, 154000
@@ -188,7 +187,6 @@ with tab2:
         verim_m = (P2_m / (P1_MW_m * 1e6)) * 100
         reg_m = (((abs(V1_m)/abs(A_m)) - V2_m) / V2_m) * 100
 
-        # UI: Parametre Kutucukları
         col_p1, col_p2 = st.columns(2)
         with col_p1:
             st.markdown("#### 📌 Temel Parametreler")
@@ -197,7 +195,6 @@ with tab2:
             st.markdown("#### 📏 Uzun Hat (A,B,C,D)")
             st.code(f"A Parametresi  : {A_m.real:.5f} + j{A_m.imag:.5f}\nB Parametresi  : {B_m.real:.4f} + j{B_m.imag:.4f} ohm\nC Parametresi  : {C_param_m.real:.6f} + j{C_param_m.imag:.6f} S\nD Parametresi  : {D_m.real:.5f} + j{D_m.imag:.5f}", language="text")
 
-        # UI: Metrik Kartları
         st.markdown("### 📊 Hat Performans Analizi")
         st.markdown("#### Hat Başı Değerleri ve Performans")
         m1, m2, m3, m4 = st.columns(4)
@@ -207,8 +204,8 @@ with tab2:
         m4.metric("Hat Verimi", f"% {round(verim_m, 2)}")
         st.write(f"**Regülasyon:** % {round(reg_m, 2)} | **Reaktif Güç:** {round(Q1_MVAr_m, 2)} MVAr | **Güç Katsayısı:** {manuel_pf}")
 
-        # UI: Tekil Analiz Grafikleri (YENİ EKLENEN KISIM)
-        st.markdown("#### Hat Boyunca Değişim Grafikleri")
+        # Tekil Senaryo P-V Eğrisi Hesaplamaları Eklendi
+        st.markdown("#### Hat Boyunca Değişim ve P-V Burun Eğrisi Grafikleri")
         x_vals_m = np.linspace(0, manuel_l, 11)
         v_list_m, p_list_m, q_list_m = [], [], []
         
@@ -223,29 +220,45 @@ with tab2:
             p_list_m.append((3 * Vx_ara * np.conj(Ix_ara)).real / 1e6)
             q_list_m.append((3 * Vx_ara * np.conj(Ix_ara)).imag / 1e6)
 
-        fig_m, ax_m = plt.subplots(1, 3, figsize=(18, 4))
+        k_loads_m = np.linspace(0.1, 1.5, 15)
+        P1_curve_m, V1_curve_m = [], []
+        for k_l in k_loads_m:
+            S2_step_m = k_l * S2_VA_m
+            I2_step_m = np.conj((complex(S2_step_m*manuel_pf, Q_sign_m*S2_step_m*np.sin(np.arccos(manuel_pf)))) / (3*V2_m))
+            V1_step_m = A_m*V2_m + B_m*I2_step_m
+            I1_step_m = C_param_m*V2_m + D_m*I2_step_m
+            V1_curve_m.append(abs(V1_step_m) * np.sqrt(3) / 1000)
+            P1_curve_m.append((3 * V1_step_m * np.conj(I1_step_m)).real / 1e6)
+
+        fig_m, ax_m = plt.subplots(2, 2, figsize=(16, 12))
         
-        ax_m[0].plot(x_vals_m, v_list_m, '-bo', lw=2, markersize=6)
-        ax_m[0].set_title("Gerilim Değişimi (10 Nokta)")
-        ax_m[0].set_xlabel("Hat Başından Uzaklık (km)")
-        ax_m[0].set_ylabel("Gerilim (kV)")
-        ax_m[0].grid(True)
+        ax_m[0, 0].plot(x_vals_m, v_list_m, '-bo', lw=2, markersize=6)
+        ax_m[0, 0].set_title("Gerilim Değişimi (10 Nokta)")
+        ax_m[0, 0].set_xlabel("Hat Başından Uzaklık (km)")
+        ax_m[0, 0].set_ylabel("Gerilim (kV)")
+        ax_m[0, 0].grid(True)
 
-        ax_m[1].plot(x_vals_m, p_list_m, '-go', lw=2, markersize=6)
-        ax_m[1].set_title("Aktif Güç Değişimi (10 Nokta)")
-        ax_m[1].set_xlabel("Hat Başından Uzaklık (km)")
-        ax_m[1].set_ylabel("Aktif Güç (MW)")
-        ax_m[1].grid(True)
+        ax_m[0, 1].plot(x_vals_m, p_list_m, '-go', lw=2, markersize=6)
+        ax_m[0, 1].set_title("Aktif Güç Değişimi (10 Nokta)")
+        ax_m[0, 1].set_xlabel("Hat Başından Uzaklık (km)")
+        ax_m[0, 1].set_ylabel("Aktif Güç (MW)")
+        ax_m[0, 1].grid(True)
 
-        ax_m[2].plot(x_vals_m, q_list_m, '-ro', lw=2, markersize=6)
-        ax_m[2].set_title("Reaktif Güç Değişimi (10 Nokta)")
-        ax_m[2].set_xlabel("Hat Başından Uzaklık (km)")
-        ax_m[2].set_ylabel("Reaktif Güç (MVAr)")
-        ax_m[2].grid(True)
+        ax_m[1, 0].plot(x_vals_m, q_list_m, '-ro', lw=2, markersize=6)
+        ax_m[1, 0].set_title("Reaktif Güç Değişimi (10 Nokta)")
+        ax_m[1, 0].set_xlabel("Hat Başından Uzaklık (km)")
+        ax_m[1, 0].set_ylabel("Reaktif Güç (MVAr)")
+        ax_m[1, 0].grid(True)
 
+        ax_m[1, 1].plot(P1_curve_m, V1_curve_m, '-k*', lw=2, markersize=8)
+        ax_m[1, 1].set_title("P-V Burun Eğrisi")
+        ax_m[1, 1].set_xlabel("Hat Başı Aktif Gücü P1 (MW)")
+        ax_m[1, 1].set_ylabel("Hat Başı Gerilimi V1 (kV)")
+        ax_m[1, 1].grid(True)
+
+        plt.tight_layout()
         st.pyplot(fig_m)
 
-        # UI: Seri Kompanzasyon Performansı
         st.markdown("#### Seri Kompanzasyon Performansı")
         for comp_ratio, load_mult in [(0.30, 1), (0.50, 1), (0.30, 10), (0.50, 10)]:
             X_L_m = w*L_m
@@ -353,10 +366,10 @@ with tab2:
                 grafik_datalari.append({
                     "k_no": k_no, "iletken": iletken, "l": l, "pf": pf, "pf_str": pf_str,
                     "gamma": gamma, "Zc": Zc, "V2": V2, "I2": I2, "C_param": C_param, 
-                    "A": A, "B": B, "D": D, "S2_VA": S2_VA, "Q_sign": Q_sign
+                    "A": A, "B": B, "D": D, "S2_VA": S2_VA, "Q_sign": Q_sign,
+                    "U1_kV": U1_kV, "I1_A": I1_A, "P1_MW": P1_MW, "Q1_MVAr": Q1_MVAr, "verim": verim, "reg": reg
                 })
 
-            # Tablolar
             st.success("✅ Toplu Analiz Başarıyla Tamamlandı!")
             st.markdown("### 📋 A Şıkkı: Nominal Yükleme (SIL) Tablosu")
             st.dataframe(pd.DataFrame(sonuclar_A), use_container_width=True)
@@ -365,10 +378,8 @@ with tab2:
             st.dataframe(pd.DataFrame(sonuclar_D), use_container_width=True)
             st.divider()
 
-            # Grafikler ve Yorumlar
             st.markdown("### 📉 Koşullara Özel Değişim ve P-V Eğrileri")
             
-            # Her Koşul İçin Özel Yorum Sözlüğü
             yorumlar = {
                 1: "154 kV seviyesinde ve 100 km gibi orta uzunluktaki bu hatta, endüktif yük çekimi (0.95) beklendiği gibi doğal bir gerilim düşümüne sebep olmuştur. Hat kararlı sınırlar içindedir.",
                 2: "150 km'ye uzayan hatta kapasitif yüklenme, Ferranti etkisini belirginleştirerek hat sonu gerilimini kaynak geriliminin üzerine taşımıştır. Negatif regülasyon gözlenmektedir.",
@@ -381,6 +392,15 @@ with tab2:
             
             for g_data in grafik_datalari:
                 st.markdown(f"#### 🔹 Koşul {g_data['k_no']}: {g_data['iletken']}, {g_data['l']}km, {g_data['pf']} {g_data['pf_str']}")
+                
+                # Her koşulun altına metrikleri ekledim
+                c1, c2, c3, c4 = st.columns(4)
+                c1.metric("Hat Başı Gerilimi (V1)", f"{round(g_data['U1_kV'], 2)} kV")
+                c2.metric("Hat Başı Akımı (I1)", f"{round(g_data['I1_A'], 2)} A")
+                c3.metric("Aktif Güç (P1)", f"{round(g_data['P1_MW'], 2)} MW")
+                c4.metric("Verim", f"% {round(g_data['verim'], 2)}")
+                st.write(f"**Regülasyon:** % {round(g_data['reg'], 2)} | **Reaktif Güç:** {round(g_data['Q1_MVAr'], 2)} MVAr")
+                
                 st.info(f"**Teknik Analiz:** {yorumlar[g_data['k_no']]}")
 
                 x_vals = np.linspace(0, g_data['l'], 11)
