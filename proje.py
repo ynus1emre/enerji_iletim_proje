@@ -178,7 +178,7 @@ with tab2:
     # -------------------------------------------------------------------------
     # BÖLÜM 2.1: MANUEL KULLANICI GİRİŞLİ TEKİL ANALİZ 
     # -------------------------------------------------------------------------
-    st.markdown("### 🎛️ Tekil Senaryo Simülatörü")
+    st.markdown("### 🎛️ Tekil Senaryo")
     with st.container():
         col_m1, col_m2 = st.columns(2)
         with col_m1:
@@ -322,7 +322,7 @@ with tab2:
     # -------------------------------------------------------------------------
     # BÖLÜM 2.2: TOPLU 7 KOŞUL ANALİZİ VE GRAFİKLER
     # -------------------------------------------------------------------------
-    st.markdown("### 📑 Grup 7 Toplu Rapor Üretici (7 Koşul)")
+    st.markdown("### 📑 Grup 7 Toplu Hesaplama (7 Koşul)")
     
     if st.button("🚀 Tüm 7 Koşulu Analiz Et ve Raporla", use_container_width=True, type="secondary"):
         with st.spinner("Tüm koşullar hesaplanıyor, tablolar ve grafikler oluşturuluyor..."):
