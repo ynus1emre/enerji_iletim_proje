@@ -155,87 +155,128 @@ with tab2:
             manuel_l = st.number_input("📏 Hat Uzunluğu (km)", value=100.0, step=10.0)
             manuel_pf = st.number_input("⚡ Güç Katsayısı", value=0.95, step=0.01)
             manuel_pf_tip = st.selectbox("🔄 Katsayı Tipi", ["Endüktif", "Kapasitif"])
+            
+        tekil_hesapla_btn = st.button("⚙️ Tekil Senaryoyu Hesapla", type="primary", use_container_width=True)
 
-    # Tekil Senaryo Arka Plan Hesaplamaları
-    if "154" in manuel_senaryo:
-        R_m, L_m, C_m, U2_m = R_drake, L_drake, C_drake, 154000
-    else:
-        R_m, L_m, C_m, U2_m = R_rail, L_rail, C_rail, 400000
+    # Butona basıldığında çalışacak tekil hesaplama bloğu
+    if tekil_hesapla_btn:
+        if "154" in manuel_senaryo:
+            R_m, L_m, C_m, U2_m = R_drake, L_drake, C_drake, 154000
+        else:
+            R_m, L_m, C_m, U2_m = R_rail, L_rail, C_rail, 400000
 
-    Z_m = complex(R_m, w*L_m); Y_m = complex(0, w*C_m)
-    gamma_m = np.sqrt(Z_m * Y_m); Zc_m = np.sqrt(Z_m / Y_m)
-    A_m = np.cosh(gamma_m * manuel_l); B_m = Zc_m * np.sinh(gamma_m * manuel_l)
-    C_param_m = (1/Zc_m) * np.sinh(gamma_m * manuel_l); D_m = A_m
+        Z_m = complex(R_m, w*L_m); Y_m = complex(0, w*C_m)
+        gamma_m = np.sqrt(Z_m * Y_m); Zc_m = np.sqrt(Z_m / Y_m)
+        A_m = np.cosh(gamma_m * manuel_l); B_m = Zc_m * np.sinh(gamma_m * manuel_l)
+        C_param_m = (1/Zc_m) * np.sinh(gamma_m * manuel_l); D_m = A_m
 
-    V2_m = U2_m / np.sqrt(3)
-    Q_sign_m = -1 if manuel_pf_tip == "Kapasitif" else 1
-    Z_sur_m = np.sqrt(L_m/C_m)
-    S2_VA_m = (U2_m**2) / Z_sur_m
-    P2_m = S2_VA_m * manuel_pf
-    Q2_m = Q_sign_m * S2_VA_m * np.sin(np.arccos(manuel_pf))
-    I2_m = np.conj(complex(P2_m, Q2_m) / (3 * V2_m))
+        V2_m = U2_m / np.sqrt(3)
+        Q_sign_m = -1 if manuel_pf_tip == "Kapasitif" else 1
+        Z_sur_m = np.sqrt(L_m/C_m)
+        S2_VA_m = (U2_m**2) / Z_sur_m
+        P2_m = S2_VA_m * manuel_pf
+        Q2_m = Q_sign_m * S2_VA_m * np.sin(np.arccos(manuel_pf))
+        I2_m = np.conj(complex(P2_m, Q2_m) / (3 * V2_m))
 
-    V1_m = A_m*V2_m + B_m*I2_m
-    I1_m = C_param_m*V2_m + D_m*I2_m
+        V1_m = A_m*V2_m + B_m*I2_m
+        I1_m = C_param_m*V2_m + D_m*I2_m
 
-    U1_kV_m = abs(V1_m) * np.sqrt(3) / 1000
-    I1_A_m = abs(I1_m)
-    P1_MW_m = (3 * V1_m * np.conj(I1_m)).real / 1e6
-    Q1_MVAr_m = (3 * V1_m * np.conj(I1_m)).imag / 1e6
-    verim_m = (P2_m / (P1_MW_m * 1e6)) * 100
-    reg_m = (((abs(V1_m)/abs(A_m)) - V2_m) / V2_m) * 100
+        U1_kV_m = abs(V1_m) * np.sqrt(3) / 1000
+        I1_A_m = abs(I1_m)
+        P1_MW_m = (3 * V1_m * np.conj(I1_m)).real / 1e6
+        Q1_MVAr_m = (3 * V1_m * np.conj(I1_m)).imag / 1e6
+        verim_m = (P2_m / (P1_MW_m * 1e6)) * 100
+        reg_m = (((abs(V1_m)/abs(A_m)) - V2_m) / V2_m) * 100
 
-    # UI: Parametre Kutucukları
-    col_p1, col_p2 = st.columns(2)
-    with col_p1:
-        st.markdown("#### 📌 Temel Parametreler")
-        st.code(f"R (AA Direnci) : {R_m:.4f} ohm/km\nL (Endüktans)  : {L_m*1000:.4f} mH/km\nC (Kapasitans) : {C_m*1e9:.4f} nF/km\nZ (Seri Emp.)  : {Z_m.real:.4f} + j{Z_m.imag:.4f} ohm/km\nY (Paralel Ad.): {Y_m.real:.4f} + j{Y_m.imag:.6f} S/km", language="text")
-    with col_p2:
-        st.markdown("#### 📏 Uzun Hat (A,B,C,D)")
-        st.code(f"A Parametresi  : {A_m.real:.5f} + j{A_m.imag:.5f}\nB Parametresi  : {B_m.real:.4f} + j{B_m.imag:.4f} ohm\nC Parametresi  : {C_param_m.real:.6f} + j{C_param_m.imag:.6f} S\nD Parametresi  : {D_m.real:.5f} + j{D_m.imag:.5f}", language="text")
+        # UI: Parametre Kutucukları
+        col_p1, col_p2 = st.columns(2)
+        with col_p1:
+            st.markdown("#### 📌 Temel Parametreler")
+            st.code(f"R (AA Direnci) : {R_m:.4f} ohm/km\nL (Endüktans)  : {L_m*1000:.4f} mH/km\nC (Kapasitans) : {C_m*1e9:.4f} nF/km\nZ (Seri Emp.)  : {Z_m.real:.4f} + j{Z_m.imag:.4f} ohm/km\nY (Paralel Ad.): {Y_m.real:.4f} + j{Y_m.imag:.6f} S/km", language="text")
+        with col_p2:
+            st.markdown("#### 📏 Uzun Hat (A,B,C,D)")
+            st.code(f"A Parametresi  : {A_m.real:.5f} + j{A_m.imag:.5f}\nB Parametresi  : {B_m.real:.4f} + j{B_m.imag:.4f} ohm\nC Parametresi  : {C_param_m.real:.6f} + j{C_param_m.imag:.6f} S\nD Parametresi  : {D_m.real:.5f} + j{D_m.imag:.5f}", language="text")
 
-    # UI: Metrik Kartları
-    st.markdown("### 📊 Hat Performans Analizi")
-    st.markdown("#### Hat Başı Değerleri ve Performans")
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Hat Başı Gerilimi (V1)", f"{round(U1_kV_m, 2)} kV")
-    m2.metric("Hat Başı Akımı (I1)", f"{round(I1_A_m, 2)} A")
-    m3.metric("Aktif Güç (P1)", f"{round(P1_MW_m, 2)} MW")
-    m4.metric("Hat Verimi", f"% {round(verim_m, 2)}")
-    st.write(f"**Regülasyon:** % {round(reg_m, 2)} | **Reaktif Güç:** {round(Q1_MVAr_m, 2)} MVAr | **Güç Katsayısı:** {manuel_pf}")
+        # UI: Metrik Kartları
+        st.markdown("### 📊 Hat Performans Analizi")
+        st.markdown("#### Hat Başı Değerleri ve Performans")
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("Hat Başı Gerilimi (V1)", f"{round(U1_kV_m, 2)} kV")
+        m2.metric("Hat Başı Akımı (I1)", f"{round(I1_A_m, 2)} A")
+        m3.metric("Aktif Güç (P1)", f"{round(P1_MW_m, 2)} MW")
+        m4.metric("Hat Verimi", f"% {round(verim_m, 2)}")
+        st.write(f"**Regülasyon:** % {round(reg_m, 2)} | **Reaktif Güç:** {round(Q1_MVAr_m, 2)} MVAr | **Güç Katsayısı:** {manuel_pf}")
 
-    # UI: Seri Kompanzasyon Performansı (🟢 🔴 İndikatörlü)
-    st.markdown("#### Seri Kompanzasyon Performansı")
-    for comp_ratio, load_mult in [(0.30, 1), (0.50, 1), (0.30, 10), (0.50, 10)]:
-        X_L_m = w*L_m
-        X_C_comp_m = comp_ratio * X_L_m
-        Z_comp_m = complex(R_m, X_L_m - X_C_comp_m)
-        gamma_c_m = np.sqrt(Z_comp_m * Y_m)
-        Zc_c_m = np.sqrt(Z_comp_m / Y_m)
-        A_c_m = np.cosh(gamma_c_m * manuel_l)
-        B_c_m = Zc_c_m * np.sinh(gamma_c_m * manuel_l)
-        C_c_m = (1/Zc_c_m) * np.sinh(gamma_c_m * manuel_l)
+        # UI: Tekil Analiz Grafikleri (YENİ EKLENEN KISIM)
+        st.markdown("#### Hat Boyunca Değişim Grafikleri")
+        x_vals_m = np.linspace(0, manuel_l, 11)
+        v_list_m, p_list_m, q_list_m = [], [], []
         
-        S2_comp_m = load_mult * S2_VA_m
-        I2_comp_m = np.conj((complex(S2_comp_m*manuel_pf, Q_sign_m*S2_comp_m*np.sin(np.arccos(manuel_pf)))) / (3*V2_m))
-        V1_comp_m = A_c_m*V2_m + B_c_m*I2_comp_m
-        I1_comp_m = C_c_m*V2_m + A_c_m*I2_comp_m
-        P1_c_m = (3 * V1_comp_m * np.conj(I1_comp_m)).real
-        verim_c_m = ((S2_comp_m*manuel_pf) / P1_c_m) * 100
-        reg_c_m = (((abs(V1_comp_m)/abs(A_c_m)) - V2_m) / V2_m) * 100
+        for x in x_vals_m:
+            Ax = np.cosh(gamma_m * x)
+            Bx = Zc_m * np.sinh(gamma_m * x)
+            Cx = (1/Zc_m) * np.sinh(gamma_m * x)
+            Vx_ara = Ax*V2_m + Bx*I2_m
+            Ix_ara = Cx*V2_m + Ax*I2_m
+            
+            v_list_m.append(abs(Vx_ara)*np.sqrt(3)/1000)
+            p_list_m.append((3 * Vx_ara * np.conj(Ix_ara)).real / 1e6)
+            q_list_m.append((3 * Vx_ara * np.conj(Ix_ara)).imag / 1e6)
 
-        icon = "🟢" if load_mult == 1 else "🔴"
-        load_str = "Normal Yükte (S2)" if load_mult == 1 else "Aşırı Yükte (10xS2)"
-        st.markdown(f"**{icon} {load_str}:** %{int(comp_ratio*100)} Komp. ➔ Verim: %{round(verim_c_m, 2)} | Regülasyon: %{round(reg_c_m, 2)}")
+        fig_m, ax_m = plt.subplots(1, 3, figsize=(18, 4))
+        
+        ax_m[0].plot(x_vals_m, v_list_m, '-bo', lw=2, markersize=6)
+        ax_m[0].set_title("Gerilim Değişimi (10 Nokta)")
+        ax_m[0].set_xlabel("Hat Başından Uzaklık (km)")
+        ax_m[0].set_ylabel("Gerilim (kV)")
+        ax_m[0].grid(True)
+
+        ax_m[1].plot(x_vals_m, p_list_m, '-go', lw=2, markersize=6)
+        ax_m[1].set_title("Aktif Güç Değişimi (10 Nokta)")
+        ax_m[1].set_xlabel("Hat Başından Uzaklık (km)")
+        ax_m[1].set_ylabel("Aktif Güç (MW)")
+        ax_m[1].grid(True)
+
+        ax_m[2].plot(x_vals_m, q_list_m, '-ro', lw=2, markersize=6)
+        ax_m[2].set_title("Reaktif Güç Değişimi (10 Nokta)")
+        ax_m[2].set_xlabel("Hat Başından Uzaklık (km)")
+        ax_m[2].set_ylabel("Reaktif Güç (MVAr)")
+        ax_m[2].grid(True)
+
+        st.pyplot(fig_m)
+
+        # UI: Seri Kompanzasyon Performansı
+        st.markdown("#### Seri Kompanzasyon Performansı")
+        for comp_ratio, load_mult in [(0.30, 1), (0.50, 1), (0.30, 10), (0.50, 10)]:
+            X_L_m = w*L_m
+            X_C_comp_m = comp_ratio * X_L_m
+            Z_comp_m = complex(R_m, X_L_m - X_C_comp_m)
+            gamma_c_m = np.sqrt(Z_comp_m * Y_m)
+            Zc_c_m = np.sqrt(Z_comp_m / Y_m)
+            A_c_m = np.cosh(gamma_c_m * manuel_l)
+            B_c_m = Zc_c_m * np.sinh(gamma_c_m * manuel_l)
+            C_c_m = (1/Zc_c_m) * np.sinh(gamma_c_m * manuel_l)
+            
+            S2_comp_m = load_mult * S2_VA_m
+            I2_comp_m = np.conj((complex(S2_comp_m*manuel_pf, Q_sign_m*S2_comp_m*np.sin(np.arccos(manuel_pf)))) / (3*V2_m))
+            V1_comp_m = A_c_m*V2_m + B_c_m*I2_comp_m
+            I1_comp_m = C_c_m*V2_m + A_c_m*I2_comp_m
+            P1_c_m = (3 * V1_comp_m * np.conj(I1_comp_m)).real
+            verim_c_m = ((S2_comp_m*manuel_pf) / P1_c_m) * 100
+            reg_c_m = (((abs(V1_comp_m)/abs(A_c_m)) - V2_m) / V2_m) * 100
+
+            icon = "🟢" if load_mult == 1 else "🔴"
+            load_str = "Normal Yükte (S2)" if load_mult == 1 else "Aşırı Yükte (10xS2)"
+            st.markdown(f"**{icon} {load_str}:** %{int(comp_ratio*100)} Komp. ➔ Verim: %{round(verim_c_m, 2)} | Regülasyon: %{round(reg_c_m, 2)}")
 
     st.divider()
 
     # -------------------------------------------------------------------------
     # BÖLÜM 2.2: TOPLU 7 KOŞUL ANALİZİ VE GRAFİKLER
     # -------------------------------------------------------------------------
-    st.markdown("### 📑 Grup 7 Toplu Hat Hesabı (7 Koşul)")
+    st.markdown("### 📑 Grup 7 Toplu Rapor Üretici (7 Koşul)")
     
-    if st.button("🚀 Tüm 7 Koşulu Analiz Et ve Raporla", use_container_width=True, type="primary"):
+    if st.button("🚀 Tüm 7 Koşulu Analiz Et ve Raporla", use_container_width=True, type="secondary"):
         with st.spinner("Tüm koşullar hesaplanıyor, tablolar ve grafikler oluşturuluyor..."):
             
             kosullar = [
