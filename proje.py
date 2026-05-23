@@ -458,9 +458,9 @@ with tab2:
 
                 fig, ax = plt.subplots(2, 2, figsize=(16, 12))
                 
-                ax[0, 0].plot(x_vals, v_list[::-1], '-bo', lw=2, markersize=6, markevery=10); ax[0, 0].set_title("Gerilim Değişimi (10 Nokta + Pürüzsüz Eğri)"); ax[0, 0].set_xlabel("Hat Başından Uzaklık (km)"); ax[0, 0].set_ylabel("Gerilim (kV)"); ax[0, 0].grid(True)
-                ax[0, 1].plot(x_vals, p_list[::-1], '-go', lw=2, markersize=6, markevery=10); ax[0, 1].set_title("Aktif Güç Değişimi (10 Nokta + Pürüzsüz Eğri)"); ax[0, 1].set_xlabel("Hat Başından Uzaklık (km)"); ax[0, 1].set_ylabel("Aktif Güç (MW)"); ax[0, 1].grid(True)
-                ax[1, 0].plot(x_vals, q_list[::-1], '-ro', lw=2, markersize=6, markevery=10); ax[1, 0].set_title("Reaktif Güç Değişimi (10 Nokta + Pürüzsüz Eğri)"); ax[1, 0].set_xlabel("Hat Başından Uzaklık (km)"); ax[1, 0].set_ylabel("Reaktif Güç (MVAr)"); ax[1, 0].grid(True)
+                ax[0, 0].plot(x_vals, v_list[::-1], '-bo', lw=2, markersize=6, markevery=10); ax[0, 0].set_title("Gerilim Değişimi "); ax[0, 0].set_xlabel("Hat Başından Uzaklık (km)"); ax[0, 0].set_ylabel("Gerilim (kV)"); ax[0, 0].grid(True)
+                ax[0, 1].plot(x_vals, p_list[::-1], '-go', lw=2, markersize=6, markevery=10); ax[0, 1].set_title("Aktif Güç Değişimi "); ax[0, 1].set_xlabel("Hat Başından Uzaklık (km)"); ax[0, 1].set_ylabel("Aktif Güç (MW)"); ax[0, 1].grid(True)
+                ax[1, 0].plot(x_vals, q_list[::-1], '-ro', lw=2, markersize=6, markevery=10); ax[1, 0].set_title("Reaktif Güç Değişimi "); ax[1, 0].set_xlabel("Hat Başından Uzaklık (km)"); ax[1, 0].set_ylabel("Reaktif Güç (MVAr)"); ax[1, 0].grid(True)
                 ax[1, 1].plot(P1_curve, V1_curve, '-k*', lw=2, markersize=8, markevery=5); ax[1, 1].set_title("P-V Burun Eğrisi"); ax[1, 1].set_xlabel("Hat Başı Aktif Gücü P1 (MW)"); ax[1, 1].set_ylabel("Hat Başı Gerilimi V1 (kV)"); ax[1, 1].grid(True)
                 
                 plt.tight_layout(); st.pyplot(fig); st.markdown("<br>", unsafe_allow_html=True)
