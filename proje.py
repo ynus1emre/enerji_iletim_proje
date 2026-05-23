@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # --- SAYFA AYARLARI ---
-st.set_page_config(page_title="Enerji İletim Hesaplayıcı", layout="wide", page_icon="⚡")
+st.set_page_config(page_title="Enerji İletim Hesaplayıcı | Grup 7", layout="wide", page_icon="⚡")
 
 # --- LOGO VE KLASÖR YOLU KONTROLÜ ---
 base_path = os.path.dirname(__file__)
@@ -22,7 +22,7 @@ with st.sidebar:
         st.caption("Elektrik Mühendisliği Bölümü")
         st.info("Not: 'kou_logo.jpg' dosyası bulunamadı.")
 
-    st.title("👨‍💻 Proje Ekibi")
+    st.title("👨‍💻 Grup 7 Proje Ekibi")
     st.divider()
     st.markdown("👥 **Grup Üyeleri:**")
     st.markdown("1. Yunus Emre Koca - 230206019")
@@ -37,7 +37,7 @@ with st.sidebar:
 
 # --- ANA EKRAN BAŞLIK ---
 st.title("⚡ Enerji İletim Hatları Hesaplama Aracı")
-st.subheader("154kV ve 400kV Hat Parametreleri ve Analizleri")
+st.subheader("Grup 7 Özel: 154kV Drake ve 400kV Rail Hat Analizleri")
 st.divider()
 
 # --- UYGULAMAYI SEKMELERE BÖLME ---
@@ -138,17 +138,17 @@ with tab1:
 # ==========================================
 with tab2:
     st.markdown("### 🎯 Kısım 2: Grup 7 Özel Analizleri (7 Koşul)")
-    st.info("Bu modül, A, B, C ve D şıklarındaki analizleri 7 grup koşulu için sıralı olarak hesaplar, tabloları oluşturur ve P-V / Gerilim grafiklerini çizer.")
+    st.info("Bu modül, A, B, C ve D şıklarındaki analizleri Grup 7'ye özel tahsis edilen 154kV (Drake) ve 400kV (Rail) koşulları için sıralı olarak hesaplar, tabloları oluşturur ve P-V / Gerilim grafiklerini çizer.")
     
     if st.button("🚀 Tüm Analizleri Başlat ve Çizdir", use_container_width=True, type="primary"):
         with st.spinner("Hesaplamalar yapılıyor ve grafikler çiziliyor... Lütfen bekleyin."):
             
-            # Hat Sabitleri
+            # Hat Sabitleri (Grup 7'ye Özel Doğrulanmış Hesaplamalar)
             f = 50.0; w = 2 * np.pi * f
-            R_drake, L_drake, C_drake = 0.0405, 0.582e-3, 19.85e-9  # Çift Devre TA1
-            R_rail, L_rail, C_rail = 0.03417, 0.9982e-3, 11.40e-9   # Tek Devre 2'li Demet 3B1
+            R_drake, L_drake, C_drake = 0.0405, 0.582e-3, 19.85e-9  # Çift Devre TA1 (154kV)
+            R_rail, L_rail, C_rail = 0.03417, 0.9982e-3, 11.40e-9   # Tek Devre 2'li Demet 3B1 (400kV)
             
-            # Koşullar Matrisi: 1=Kapasitif, -1=Endüktif
+            # Grup 7 Koşullar Matrisi: 1=Kapasitif, -1=Endüktif
             kosullar = [
                 (1, 154, 100, 0.95, -1, "Drake (Çift)"),
                 (2, 154, 150, 0.95, 1, "Drake (Çift)"),
@@ -192,7 +192,7 @@ with tab2:
                 Z_sur = np.sqrt(L/C)
                 S2_VA = (U2**2) / Z_sur
                 P2 = S2_VA * pf
-                Q2 = Q_sign * S2_VA * np.sin(np.arccos(pf)) # Doğru işaret atandı
+                Q2 = Q_sign * S2_VA * np.sin(np.arccos(pf)) 
                 I2 = np.conj(complex(P2, Q2) / (3 * V2))
                 
                 V1 = A*V2 + B*I2
@@ -232,7 +232,6 @@ with tab2:
                     
                     for load_mult in [1, 10]:
                         S2_comp = load_mult * S2_VA
-                        # Q_sign düzeltmesi buraya da eklendi
                         I2_comp = np.conj((complex(S2_comp*pf, Q_sign*S2_comp*np.sin(np.arccos(pf)))) / (3*V2))
                         
                         V1_comp = A_c*V2 + B_c*I2_comp
@@ -275,7 +274,6 @@ with tab2:
                 P1_curve, V1_curve = [], []
                 for k_l in k_loads:
                     S2_step = k_l * S2_VA
-                    # Q_sign düzeltmesi
                     I2_step = np.conj((complex(S2_step*pf, Q_sign*S2_step*np.sin(np.arccos(pf)))) / (3*V2))
                     V1_step = A*V2 + B*I2_step
                     I1_step = C_param*V2 + D*I2_step
